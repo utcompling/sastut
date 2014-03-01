@@ -1,0 +1,56 @@
+#!/bin/bash
+
+EXIT_CODE=0
+
+if [ -z $EMOKIDS_DIR ] 
+then
+   EMOKIDS_DIR=`dirname $0`/../
+fi
+
+if [ -z $JAVA_MEM_FLAG ] 
+then
+    JAVA_MEM_FLAG=-Xmx4g
+fi
+
+MANAGED_JARS="`find $EMOKIDS_DIR/lib_managed -name '*.jar' -print | tr '\n' ':'`"
+UNMANAGED_JARS="`find $EMOKIDS_DIR/lib -name '*.jar' -print | tr '\n' ':'`"
+
+SCALA_LIB="$HOME/.sbt/boot/scala-2.10.1/lib/scala-library.jar"
+
+CP="$EMOKIDS_DIR/target/classes:$SCALA_LIB:$EMOKIDS_DIR/src/main/resources:$MANAGED_JARS:$UNMANAGED_JARS"
+
+JAVA="$JAVA_HOME/bin/java"
+JAVA_COMMAND="$JAVA -classpath $CP -Demokids.dir=$EMOKIDS_DIR"
+
+CMD=$1
+shift
+
+help()
+{
+cat <<EOF
+emokids 0.1 commands: 
+
+  convert-stanford convert the Stanford data to the standard XML format
+  exp              run an experiment (train and evaluate a model)  
+  run              run the main method of a given class
+
+Include --help with any option for more information
+EOF
+}
+
+CLASS=
+
+case $CMD in
+    convert-stanford) CLASS=emokids.StanfordToXmlConverter;;
+    convert-emoticon) CLASS=emokids.EmoticonToXmlConverter;;
+    exp) CLASS=emokids.PolarityExperiment;;
+    run) CLASS=$1; shift;;
+    help) help; exit 1;;
+    *) echo "Unrecognized command: $CMD"; help; exit 1;;
+esac
+
+$JAVA_COMMAND $CLASS ${1+"$@"} 
+(( EXIT_CODE += $? ))
+
+exit $EXIT_CODE
+
