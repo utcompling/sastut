@@ -1,34 +1,6 @@
 package sastut
 
 /**
- * An object that sets up the configuration for command-line options using
- * Scallop and returns the options, ready for use.
- */
-object PolarityExperimentOpts {
-
-  import org.rogach.scallop._
-  
-  def apply(args: Array[String]) = new ScallopConf(args) {
-    banner("""
-Classification application.
-
-For usage see below:
-	     """)
-    val method = opt[String]("method", default=Some("L2R_LR"), descr="The type of solver to use. Possible values: majority , lexicon, or any liblinear solver type.")
-
-    val cost = opt[Double]("cost", default=Some(1.0), validate = (0<), descr="The cost parameter C. Bigger values means less regularization (more fidelity to the training set).")
-
-    val trainfiles = opt[List[String]]("train", descr="The files containing training events.")
-    val evalfiles = opt[List[String]]("eval", descr="The files containing evalualation events.")
-    val extended = opt[Boolean]("extended", short = 'x', descr="Use extended features.")
-    val help = opt[Boolean]("help", noshort=true, descr="Show this message")
-    val detailed = opt[Boolean]("detailed")
-    val verbose = opt[Boolean]("verbose")
-  }
-}
-
-
-/**
  * A standalone application that is the entry point for running sentiment analysis
  * experiments on the Twitter datasets in data/classify.
  */
@@ -42,8 +14,14 @@ object PolarityExperiment {
 
     val opts = PolarityExperimentOpts(args)
 
+    val datasetReader = 
+      if (opts.format() == "imdb") 
+	new ImdbDatasetReader 
+      else 
+	new XmlDatasetReader
+
     val examples = 
-      for (file <- opts.trainfiles(); ex <- DatasetReader(new File(file))) 
+      for (file <- opts.trainfiles(); ex <- datasetReader(new File(file))) 
         yield ex
 
     lazy val featurizer = if (opts.extended()) ExtendedFeaturizer else BasicFeaturizer
@@ -53,6 +31,10 @@ object PolarityExperiment {
 
       case "lexicon" => new LexiconRatioClassifier
 
+      case "simple" => new SimplestEverClassifier
+
+      case "small_lexicon" => new SmallLexiconClassifier
+
       case solverDescription =>
         val solver = nak.liblinear.Solver(solverDescription)
         val config = new nak.liblinear.LiblinearConfig(solverType=solver,cost=opts.cost())
@@ -61,7 +43,7 @@ object PolarityExperiment {
 
     val results = for (file <- opts.evalfiles()) yield {
       val evalSource = new File(file)
-      val evalExamples = DatasetReader(evalSource)
+      val evalExamples = datasetReader(evalSource)
       val evalTweets = evalExamples.map(_.features)
       val (predictions, confidence) = evalTweets.map(classifier).unzip
       val tweetTexts = evalTweets.map(_.content)
@@ -83,4 +65,32 @@ object PolarityExperiment {
 
 }
 
+
+/**
+ * An object that sets up the configuration for command-line options using
+ * Scallop and returns the options, ready for use.
+ */
+object PolarityExperimentOpts {
+
+  import org.rogach.scallop._
+  
+  def apply(args: Array[String]) = new ScallopConf(args) {
+    banner("""
+Classification application.
+
+For usage see below:
+	     """)
+    val method = opt[String]("method", default=Some("L2R_LR"), descr="The type of solver to use. Possible values: majority , lexicon, or any liblinear solver type.")
+
+    val cost = opt[Double]("cost", default=Some(1.0), validate = (0<), descr="The cost parameter C. Bigger values means less regularization (more fidelity to the training set).")
+
+    val trainfiles = opt[List[String]]("train", descr="The files containing training events.",default=Some(List[String]()))
+    val evalfiles = opt[List[String]]("eval", descr="The files containing evalualation events.")
+    val extended = opt[Boolean]("extended", short = 'x', descr="Use extended features.")
+    val format = opt[String]("format",default=Some("xml"), descr="The format that the training and eval files are in. Possible values: xml and imdb.")
+    val help = opt[Boolean]("help", noshort=true, descr="Show this message")
+    val detailed = opt[Boolean]("detailed")
+    val verbose = opt[Boolean]("verbose")
+  }
+}
 

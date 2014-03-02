@@ -48,6 +48,45 @@ object Tokenizer {
   //def apply(text: String) = text.split("\\s+")
 }
 
+class SimplestEverClassifier extends TextClassifier[Tweet] {
+  def apply(tweet: Tweet) = {
+    val content = tweet.content
+    val tokens = Tokenizer(content)
+    val prediction = 
+      if (tokens.contains("good"))
+	"positive"
+      else if (tokens.contains("bad"))
+	"negative"
+      else
+	"neutral"
+    (prediction,1.0)
+  }
+}
+
+class SmallLexiconClassifier extends TextClassifier[Tweet] {
+  val positive = Set("good")
+  val negative = Set("bad")
+
+  //val positive = Set("good","awesome","great","fantastic","wonderful")
+  //val negative = Set("bad","terrible","worst","sucks","awful","dumb")
+
+  //val positive = Set("good","awesome","great","fantastic","wonderful","perfection","captures","wonderfully","powell","refreshing","flynn","delightful","gripping","beautifully","underrated","superb","delight","welles","unforgettable","touching","favorites","extraordinary","stewart","brilliantly","friendship","wonderful","magnificent","finest","marie","jackie","freedom","pleasantly","fantastic","terrific","outstanding","noir","ruth","marvelous","exceptional","excellent","poignant","chilling","gem","amazing","ralph","chan","bette","kelly","errol","overlooked","gritty","shines","portrait","innocence","powerful","ensemble","burns","remarkable","pitt","carol","barbara","favorite","norma","stunning","favourite","von","journey","perfect","crafted","appreciated","subtle","brilliant","recommended","daniel","troubled","consequences","wilder","bond","sensitive","prince","perfectly","haunting","emotions",":)","courage","loved","highly","rare","nominated","tony","everyday","irene","contrast","fabulous","rival","notch","helps","unique","intense","jimmy","today","awesome","balance","spectacular","provides")
+
+  //val negative = Set("bad","terrible","worst","sucks","awful","dumb","dude","cheap","trite","dracula","joke","random","fake","unbelievable","poor","screaming","utter","disappointing","cliché","irritating","supposed","disappointment","zombies","clichéd","asleep","mediocre","fails","unless","bad","annoying","mildly","bland","ludicrous","amateur","obnoxious","horribly","bother","unintentionally","dumb","costs","shark","embarrassed","plastic","ripped","turkey","junk","boring","rip-off","rubbish","useless","whatsoever","unbelievably","ridiculous","excuse","crappy","vampires","forgettable","avoid","dull","wooden","inept","ashamed","stupid","mess","garbage","embarrassing","badly","suck","terrible","worse","pile","dreadful","tedious","crap","cardboard","wasted","insulting","stupidity","idiotic","pathetic","amateurish","horrible","unconvincing","uninteresting","insult","uninspired","sucks","miserably","boredom","cannibal","godzilla","lame","wasting","remotely","awful","poorly","laughable","worst","lousy","redeeming","atrocious","pointless","blah","waste","unfunny","seagal")
+
+  def apply(tweet: Tweet) = {
+    val content = tweet.content
+    val tokens = Tokenizer(content)
+    val positiveCount = tokens.count(positive).toDouble
+    val negativeCount = tokens.count(negative).toDouble
+    List(
+      ("positive",positiveCount),
+      ("negative",negativeCount),
+      ("neutral",.9)
+    ).sortBy(_._2).last
+  }
+}
+
 
 /**
  * A classifier that counts positive and negative terms in a text and picks a

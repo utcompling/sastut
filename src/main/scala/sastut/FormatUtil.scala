@@ -1,18 +1,43 @@
 package sastut
 
+import java.io.File
+import nak.data.Example
+
+
 /**
  * A simple case class to store information associated with a Tweet.
  */
 case class Tweet(val tweetid: String, val username: String, val content: String)
 
+trait DatasetReader extends (File => Seq[Example[String,Tweet]])
+
+class ImdbDatasetReader extends DatasetReader {
+
+  val mapLabel = Map("neg" -> "negative", "pos" -> "positive")
+
+  def apply(topdir: File): Seq[Example[String,Tweet]] = {
+    for {
+      dir <- topdir.listFiles.toSeq.filter(_.isDirectory)
+      dirLabel = dir.getName
+      if dirLabel == "pos" | dirLabel == "neg"
+      file <- dir.listFiles.toSeq.take(1000)
+    } yield {
+      val label =  mapLabel(dirLabel)
+      val fileSource = io.Source.fromFile(file)
+      val text = fileSource.mkString
+      fileSource.close
+      Example(label, Tweet(file.getName, "none", text))
+    }
+
+  }
+}
+
 /**
  * Read in a polarity labeled dataset from XML.
  */
-object DatasetReader {
+class XmlDatasetReader extends DatasetReader {
 
-  import nak.data.Example
   import scala.xml._
-  import java.io.File
 
   // Allow NodeSeqs to implicitly convert to Strings when needed.
   implicit def nodeSeqToString(ns: NodeSeq) = ns.text
