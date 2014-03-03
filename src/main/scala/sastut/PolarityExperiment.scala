@@ -16,7 +16,9 @@ object PolarityExperiment {
 
     val datasetReader = 
       if (opts.format() == "imdb") 
-	new ImdbDatasetReader 
+	new ImdbIndexedDatasetReader 
+      else if (opts.format() == "imdb_raw") 
+	new ImdbRawDatasetReader 
       else 
 	new XmlDatasetReader
 
@@ -87,7 +89,7 @@ For usage see below:
     val trainfiles = opt[List[String]]("train", descr="The files containing training events.",default=Some(List[String]()))
     val evalfiles = opt[List[String]]("eval", descr="The files containing evalualation events.")
     val extended = opt[Boolean]("extended", short = 'x', descr="Use extended features.")
-    val format = opt[String]("format",default=Some("xml"), descr="The format that the training and eval files are in. Possible values: xml and imdb.")
+    val format = opt[String]("format",default=Some("xml"), descr="The format that the training and eval files are in. Possible values: xml, imdb, and imdb_raw.")
     val help = opt[Boolean]("help", noshort=true, descr="Show this message")
     val detailed = opt[Boolean]("detailed")
     val verbose = opt[Boolean]("verbose")

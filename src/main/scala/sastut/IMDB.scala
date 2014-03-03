@@ -57,13 +57,15 @@ object LLR {
 
     println("\n---------------------")
     println("Highly positive terms.")
-    //llratiosSorted.take(100).foreach(println) 
-    println("\""+llratiosSorted.take(100).map(_._1).mkString("\",\"")+"\"")
+    //for ((word,llr) <- llratiosSorted.take(50)) println(word+"\t"+llr)
+    //println("\""+llratiosSorted.take(1000).map(_._1).mkString("\",\"")+"\"")
+    println(llratiosSorted.take(25).map(_._1).mkString(" "))
 
     println("\n---------------------")
     println("Highly negative terms.")
-    //llratiosSorted.takeRight(100).foreach(println) 
-    println("\""+llratiosSorted.takeRight(100).map(_._1).mkString("\",\"")+"\"")
+    //for ((word,llr) <- llratiosSorted.takeRight(50)) println(word+"\t"+llr)
+    //println("\""+llratiosSorted.takeRight(1000).map(_._1).mkString("\",\"")+"\"")
+    println(llratiosSorted.takeRight(25).map(_._1).mkString(" "))
 
 
     //val er = fromFile(topdir+"/imdbEr.txt").getLines.map(_.toDouble).toIndexedSeq

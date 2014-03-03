@@ -11,7 +11,33 @@ case class Tweet(val tweetid: String, val username: String, val content: String)
 
 trait DatasetReader extends (File => Seq[Example[String,Tweet]])
 
-class ImdbDatasetReader extends DatasetReader {
+class ImdbIndexedDatasetReader extends DatasetReader {
+  
+  // So this isn't the way you'd do it in general, but it makes it easy
+  // to fit the indexed data into the existing classifier methods...
+  def apply(file: File): Seq[Example[String,Tweet]] = {
+
+    // Get the vocab so we can map the numbers back to words. Brittle, but 
+    // it works for these purposes.
+    val vocab = io.Source.fromFile(new File(file.getParentFile.getParentFile,"imdb.vocab")).getLines.toIndexedSeq  
+
+    for (line <- io.Source.fromFile(file).getLines.toSeq) yield {
+      val ratingRaw :: countsRaw = line.split(" ").toList
+      val rating = ratingRaw.toInt
+
+      val text = (for { 
+	wordCountString <- countsRaw
+	Array(wordId, wordCount) = wordCountString.split(":").map(_.toInt)
+	word <- Array.fill(wordCount)(vocab(wordId))
+      } yield word).mkString(" ")
+
+      val label = if (rating > 5) "positive" else "negative"
+      Example(label, Tweet("ignore","none",text))
+    } 
+  }
+}
+
+class ImdbRawDatasetReader extends DatasetReader {
 
   val mapLabel = Map("neg" -> "negative", "pos" -> "positive")
 
@@ -20,7 +46,7 @@ class ImdbDatasetReader extends DatasetReader {
       dir <- topdir.listFiles.toSeq.filter(_.isDirectory)
       dirLabel = dir.getName
       if dirLabel == "pos" | dirLabel == "neg"
-      file <- dir.listFiles.toSeq.take(1000)
+      file <- dir.listFiles.toSeq
     } yield {
       val label =  mapLabel(dirLabel)
       val fileSource = io.Source.fromFile(file)
