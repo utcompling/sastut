@@ -1,14 +1,14 @@
-### emokids
+### SAS Tutorial
 
 ## What is it?
 
-This is a shell repository for code to create classifiers for polarity classification for tweets. The instructions may be found in [the description of homework five](https://github.com/utcompling/applied-nlp/wiki/Homework5) for the [@appliednlp](http://twitter.com/appliednlp) course.
+This is a repository for demo code for [Jason Baldridge](http://www.jasonbaldridge.com)'s [Practical Sentiment Analysis Tutorial](http://sentimentsymposium.com/workshops.html) for the [Sentiment Analysis Symposium](http://sentimentsymposium.com) on March 5, 2014.
 
-This was @jasonbaldridge's private repository while getting the homework ready. The shell repository for the students to start with is the [gpp](https://github.com/utcompling/gpp) (Genuine People Personalities) repository. If you want to give the homework a try, you can start with that, and then compare your results to those given below.
+NOTE: this is currently under construction! The notes below will be updated over the next two days.
 
-## Why is it?
+## Context
 
-Some people [have it in for computational linguists](http://xkcd.com/114/), so we gotta fight back and start categorizing all those sentimental, emotion-laden wimps out there, with all their [#firstworldproblems](https://twitter.com/search?q=%23firstworldproblems&src=tyah). Let the machine learning commence!
+This demo code was pulled out multiple sources, but primarily from the solutions key to a homework for creating classifiers for polarity classification for tweets. The original instructions may be found in [the description of homework five](https://github.com/utcompling/applied-nlp/wiki/Homework5) for the [@appliednlp](http://twitter.com/appliednlp) course.
 
 ## How well does it work?
 
