@@ -83,6 +83,8 @@ Use the -x option to use the extended features.
 $ bin/sastut exp --train data/debate08/train.xml --eval data/debate08/dev.xml data/hcr/dev.xml  data/stanford/dev.xml -m L2R_LR -x
 ```
 
+Tip: use the "-d" (or "--detailed") option to output the detailed breakdown of which items where correctly labeled, which were incorrectly labeled, separated out by kind of error.
+
 Use "small_lexicon" to use the small lexicon example. To try different lexicons, you need to modify the class SmallLexiconClassifier in the file `src/main/scala/sastut/Classifier.scala` and recompile. (I'll make this easier later today.) 
 
 For example, to use Bing Liu's lexicon, you'll need to comment out these lines:
@@ -99,4 +101,48 @@ And uncomment the second of these two lines:
   //import Polarity._
 ```
 
+To run the simple lexicon on IMDB data (this will take longer because there are many more documents):
+
+```bash
+$ bin/sastut exp --eval data/aclImdb/test/labeledBow.feat -m small_lexicon -f imdb
+```
+
+Train a logistic regression model using bag-of-words features:
+
+```bash
+$ bin/sastut exp --train data/aclImdb/train/labeledBow.feat --eval data/aclImdb/test/labeledBow.feat -m L2R_LR -f imdb
+```
+
+Note: this uses the pre-extracted features provided by Chris Potts and colleagues. We can also run on the raw text and use our own feature extraction code:
+
+```bash
+$ bin/sastut exp --train data/aclImdb/train/ --eval data/aclImdb/test/ -m L2R_LR -f imdb_raw
+```
+
+Use "-x" to use extended features.
+
+Finally, you can give multiple training set files to the `--train` option:
+
+```bash
+$ bin/sastut exp --train data/hcr/train.xml data/debate08/train.xml --eval data/debate08/dev.xml data/hcr/dev.xml data/stanford/dev.xml -m L2R_LR
+```
+
+### Sentiment lexicon expansion
+
+To do the IMDB sentiment lexicon using log-likelihood ratios:
+
+```bash
+$ bin/sastut run sastut.LLR data/aclImdb/
+```
+
 I'll provide more detail in this README later, but this is enough to start playing around.
+
+### NLP pipeline example
+
+There is a very simple [OpenNLP](http://apache.opennlp.org) pipeline that you can use to analyze raw texts. Run it as follows:
+
+```bash
+$ bin/sastut run sastut.EnglishPipeline data/vinken.txt
+```
+
+You can provide any text as an argument for it to be analyzed.
