@@ -83,8 +83,8 @@ class SmallLexiconClassifier extends TextClassifier[Tweet] {
   //val positive = Set("good")
   //val negative = Set("bad")
 
-  //val positive = Set("good","awesome","great","fantastic","wonderful")
-  //val negative = Set("bad","terrible","worst","sucks","awful","dumb")
+  val positive = Set("good","awesome","great","fantastic","wonderful")
+  val negative = Set("bad","terrible","worst","sucks","awful","dumb")
 
   //import ImdbPolarity100._
 
@@ -93,8 +93,8 @@ class SmallLexiconClassifier extends TextClassifier[Tweet] {
   // Use Bing Liu's lexicon
   //import Polarity._
 
-  val positive = ImdbPolarity1000.positive | Polarity.positive
-  val negative = ImdbPolarity1000.negative | Polarity.negative
+  //val positive = ImdbPolarity1000.positive | Polarity.positive
+  //val negative = ImdbPolarity1000.negative | Polarity.negative
 
   def apply(tweet: Tweet) = {
     val content = tweet.content
