@@ -18,7 +18,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.apache.opennlp" % "opennlp-tools" % "1.5.3",
-  "org.scalanlp" % "nak" % "1.2.1-SNAPSHOT",
+  "org.scalanlp" % "nak" % "1.2.1",
   "org.scalanlp" % "chalk" % "1.1.3-SNAPSHOT",
   "org.rogach" %% "scallop" % "0.9.5",
   "gov.nist.math" % "jama" % "1.0.2" 
